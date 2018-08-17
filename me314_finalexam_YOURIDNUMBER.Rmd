@@ -43,7 +43,7 @@ c.  (**bonus**) Naive Bayes predictors of your outcome.  (Use the **e1071** pack
 
 ### Question 4
 
-Using `quanteda`, construct an English language dictionary for "populism" for English, using the word patterns found in Appendix B of [Rooduijn, Matthijs, and Teun Pauwels. 2011. "Measuring Populism: Comparing Two Methods of Content Analysis."  *West European Politics* 34(6): 1272–83.](Exam/Populism_2011.pdf)
+Using `quanteda`, construct an English language dictionary for "populism" for English, using the word patterns found in Appendix B of [Rooduijn, Matthijs, and Teun Pauwels. 2011. "Measuring Populism: Comparing Two Methods of Content Analysis."  *West European Politics* 34(6): 1272–83.](Populism_2011.pdf)
 
 Use this dictionary to measure the relative amount of populism, as a total of all words in, the `data_corpus_irishbudget2010` when these are grouped by political party.  Hint: You will need to make two dfm objects, one for all words, and one for the dictionary, and get a proportion.  Plot the proportions by party using a dotchart.
 
