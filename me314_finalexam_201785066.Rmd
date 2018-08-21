@@ -35,7 +35,7 @@ Boston.lm.coefficients <- vector(mode = "numeric", length = 13)
 
 for (i in 2:14) {
   lm.fit <- lm(Boston$crim ~ Boston[, i])
-  Boston.lm.coefficients[i - 1] <- coef(lm.fit)[1]
+  Boston.lm.coefficients[i - 1] <- coef(lm.fit)[2]
   
   print(paste0("For predictor:", colnames(Boston)[i]))
   print(summary(lm.fit))
@@ -90,7 +90,8 @@ a.  logistic regression
 
 ```{r}
 BostonCrimMedian.lr <- glm(formula = crim ~ .,
-                           data = BostonCrimMedian.train)
+                           data = BostonCrimMedian.train,
+                           family = binomial)
 summary(BostonCrimMedian.lr)
 ```
 
@@ -99,7 +100,8 @@ BostonCrimMedian.lr.pred <- as.numeric(predict(BostonCrimMedian.lr, type = "resp
 confusionMatrix(data = factor(BostonCrimMedian.lr.pred), reference = factor(BostonCrimMedian.test$crim))
 ```
 
-    Logistic regression does an admirable job in classifying the crime rate, with an overall accurate of 87.3% using a training and test set. From the predictions, it could be seen that the main error comes from reporting a high crime rate as a low crime rate, thus lowering the specificity. In other words, if we define having a higher crime rate as the positive class, logistic regression tends to report false negative, thus making a type 2 error. Predictors nox and rad are shown to be statistically significant at the p < 0.001 level, while age and medv are statistically significant at the p < 0.01 level. ptratio, which was previously shown to be statistically significant in linear regression, is no longer shown to be statistically significant in logistic regression.
+    Logistic regression does an admirable job in classifying the crime rate, with an overall accurate of 89.7% using a training and test set. From the predictions, it could be seen that the errors are roughly split between false positives and false negatives.This shows that the classifier has no significant bias in this regard.
+    Predictors nox, dis and rad are shown to be statistically significant at the p < 0.001 level, while ptratio is statistically significant at the p < 0.01 level. 
 
 b.  kNN
 
@@ -120,7 +122,7 @@ confusionMatrix(data = factor(predict(BostonCrimMedian.knn.fit, newdata = Boston
                 reference = factor(BostonCrimMedian.test$crim))
 ```
 
-    Using cross-validation, k = 3 was selected for the kNN model. Testing using the test dataset revealed an accuracy of 93.65%, which is still superior to that of logistic regression of 87.3% above. However, performance between the two models are indistinguishable at the p < 0.05 level, as shown by the overlap by the respective 95% CI.
+    Using cross-validation, k = 3 was selected for the kNN model. Testing using the test dataset revealed an accuracy of 93.65%, which is still superior to that of logistic regression of 89.7% above. However, performance between the two models are indistinguishable at the p < 0.05 level, as shown by the overlap by the respective 95% CI.
 
 
 c.  (**bonus**) Naive Bayes predictors of your outcome.  (Use the **e1071** package for this.)
@@ -137,7 +139,7 @@ confusionMatrix(data = factor(predict(BostonCrimMedian.nb, newdata = BostonCrimM
                 reference = factor(BostonCrimMedian$crim))
 ```
 
-    The naive Bayes model performed in a manner slightly worse than the logistic regression model, and worse than the kNN model. Similarly to the logistic regression model, it tends to classify a high crime rate as a low crime rate.
+    The naive Bayes model performed in a manner worse than either of the two previous models. It tends to classify a high crime rate as a low crime rate. If we define the high crime rate as the positive class, then it tends to commit false negatives, a type II error.
 
 ### Question 3
 
@@ -159,14 +161,16 @@ Boston.crim.median.bootstrap
     
 ```{r}
 BostonCrimMedian.lrQ3 <- glm(formula = crim ~ medv + indus + age + black + ptratio,
-                             data = BostonCrimMedian)
+                             data = BostonCrimMedian,
+                             family = binomial)
 summary(BostonCrimMedian.lrQ3)
 ```
 
 ```{r}
 lr_medv_coeff <- function(x, i) {
   fit <- glm(formula = crim ~ medv + indus + age + black + ptratio,
-             data = x[i,])
+             data = x[i,],
+             family = binomial)
   
   return(coef(fit)['medv'])
 }
@@ -176,7 +180,7 @@ BostonCrimMedian.lrQ3.bootstrap.medv_coeff <- boot(data = BostonCrimMedian, stat
 BostonCrimMedian.lrQ3.bootstrap.medv_coeff
 ```
 
-    By bootstrapping with 1000 replication, we obtain a similar coefficient of the medv predictor. The standard error from bootstrapping is reported to be 0.00188, which is lower than the asymptotic standard error from the maximum likelihood of 0.00224. These values should be sufficiently close for use, and bootstrapping would be useful when maximum likelihood estimate (MLE) is not available. Increasing the number of replications would result in the standard error asymptotically approaching that given by MLE.
+    By bootstrapping with 1000 replication, we obtain a similar coefficient of the medv predictor. The standard error from bootstrapping is reported to be 0.00176, which is lower than the asymptotic standard error from the maximum likelihood of 0.00224. These values should be sufficiently close for use, and bootstrapping would be useful when maximum likelihood estimate (MLE) is not available. Increasing the number of replications would result in the standard error asymptotically approaching that given by MLE.
 
 ### Question 4
 
